@@ -53,4 +53,7 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "member_id")
     )
     private List<User> event_members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 }

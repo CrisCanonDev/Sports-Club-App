@@ -42,5 +42,6 @@ public class User {
     @ManyToMany(mappedBy = "event_members")
     private List<Event> events = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 }

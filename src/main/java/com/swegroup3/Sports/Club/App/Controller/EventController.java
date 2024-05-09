@@ -1,12 +1,10 @@
 package com.swegroup3.Sports.Club.App.Controller;
 
+import com.swegroup3.Sports.Club.App.Entities.Comment;
 import com.swegroup3.Sports.Club.App.Entities.Event;
 import com.swegroup3.Sports.Club.App.Entities.Team;
 import com.swegroup3.Sports.Club.App.Entities.User;
-import com.swegroup3.Sports.Club.App.Services.EventService;
-import com.swegroup3.Sports.Club.App.Services.MyUserDetails;
-import com.swegroup3.Sports.Club.App.Services.TeamService;
-import com.swegroup3.Sports.Club.App.Services.UserService;
+import com.swegroup3.Sports.Club.App.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,9 +22,8 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private UserService userService;
-
-
-
+    @Autowired
+    private CommentService commentService;
 
     @GetMapping("/{teamId}/new")
     public String showFormAddEvent(@PathVariable Long teamId,
@@ -126,7 +123,6 @@ public class EventController {
         return "redirect:/teams/"; //
     }
 
-
     @GetMapping("/{id}/add")
     public String addMemberToEvent(@AuthenticationPrincipal MyUserDetails userDetails, @PathVariable Long id){
         String username = userDetails.getUsername();
@@ -148,5 +144,25 @@ public class EventController {
             }
         }
         return "redirect:/teams/";
+    }
+
+    @PostMapping("/{id}/comments")
+    public String addComment(@PathVariable Long id,
+                             @AuthenticationPrincipal MyUserDetails userDetails,
+                             @RequestParam String text) {
+        String username = userDetails.getUsername();
+        User user = userService.getByUsername(username);
+        Optional<Event> eventOptional = eventService.findById(id);
+
+        if (eventOptional.isPresent()) {
+            Event event = eventOptional.get();
+            Comment comment = new Comment();
+            comment.setText(text);
+            comment.setUser(user);
+            comment.setEvent(event);
+            commentService.createComment(comment);
+        }
+
+        return "redirect:/events/" + id;
     }
 }
